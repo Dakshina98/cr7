@@ -11,20 +11,20 @@ GROQ_API_KEY = os.getenv('GROQ_API_KEY')
 client = Groq(api_key=GROQ_API_KEY)
 MODEL = 'llama3-70b-8192'
 
-#Store conversation history
+# Store conversation history
 conversation = [
     {
-        "role":"system",
-        "content":"You are a chat bot designed to answer questions about crciketer Sachin Tendulkar. You do not know anything else. If someone asks questions on topics apart from Sachin Tendulkar, just say you don't know."
+        "role": "system",
+        "content": "You are a chat bot designed to answer questions about cricketer Sachin Tendulkar. You do not know anything else. If someone asks questions on topics apart from Sachin Tendulkar, just say you don't know."
     }
 ]
 
 def get_groq_response(question):
-    global cconversation
+    global conversation
     messages = conversation + [
         {
-            "role":"user",
-            "content":question,
+            "role": "user",
+            "content": question,
         }
     ]
 
@@ -35,8 +35,8 @@ def get_groq_response(question):
     )
 
     conversation.append({
-        "role":"assistant",
-        "content":response.choices[0].message.content
+        "role": "assistant",
+        "content": response.choices[0].message.content
     })
     
     return response.choices[0].message.content
@@ -66,32 +66,31 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-#Chat interface
+# Chat interface
 if 'conversation' not in st.session_state:
     st.session_state.conversation = []
 
-def send_message():
-    question = input_box
+def send_message(question):
     if question:
-        st.session_state.conversation.append({"role":"user", "content":"question"})
+        st.session_state.conversation.append({"role": "user", "content": question})
         response = get_groq_response(question)
-        st.session_state.conversation.append({"role":"assistant","content":response})
-        
+        st.session_state.conversation.append({"role": "assistant", "content": response})
+
 # Input box for user query
 query = st.text_input("Enter your query about Sachin Tendulkar:")
 
 # Button to get response
 if st.button("Send"):
-    send_message()
+    send_message(query)
 
-#Display conversation
+# Display conversation
 user_profile_pic = "profile.png"
 assistant_profile_pic = "user.png"
 for message in st.session_state.conversation:
-    if message["role"]=="system":
+    if message["role"] == "system":
         st.image(assistant_profile_pic, width=30, output_format='PNG')
         st.markdown(f"**System:** {message['content']}")
-    elif message["role"]=="user":
+    elif message["role"] == "user":
         st.image(user_profile_pic, width=30, output_format='PNG')
         st.markdown(f"**You:** {message['content']}")
     else:
